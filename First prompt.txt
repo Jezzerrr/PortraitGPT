@@ -1,0 +1,16 @@
+The first picture is a photo of me. The second picture is an example of art I want to make. Help me create a Python script. I want these functions:
+
+Two general functions:
+- A function that takes the path of the picture as input. The output should be a square image. I want to work with square images. The square should be the center of the original picture.
+- A function that saves the picture in the output folder. If the file path already exists, the file path should be renamed by appending "_1" or "_2" etc to it.
+
+Three alter functions:
+- A function that moves one (only one!) rectangle of random width and height a little bit towards or away from the center. Input arguments are these: (1) A variable that determines the order of magnitude of the size of the rectangle. (2) A variable that determines if and how much the rectangles is to be moved towards (positive value) or away (negative value) from the center.
+- A function that moves one rectangle of random width and height a little bit along a circle around the center. Input arguments are these: (1) A variable that determines the order of magnitude of the size of the rectangle. (2) A variable that determines how many degrees the rectangle is rotated around the center.
+- A function that takes one rectangle of random width and height and enlarge or reduce it a little bit. Input arguments are these: (1) A variable that determines the order of magnitude of the size of the rectangle. (2) A variable that determines how much the rectangle should be enlarged (postivie value) or reduced (negative value).
+
+Two combining functions:
+- A function that takes one rectangle of random width and height and enlarge or reduce it a little bit. Input arguments are these: (1) The original picture. (2) The choice of alter function that should be used (one the three above). (3) The number of rectangles. (4) The other variables that are needed to feed the alter functions.
+- A function follows the whole process, from input image path to saving the resulting picture.
+
+The alter have different input arguments. Is there a way to deal with all the different types of input arguments the alter functions need? I want the first combining function (which calls an alter function) to be as general as possible.
