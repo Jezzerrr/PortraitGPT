@@ -8,6 +8,7 @@ import os
 import seaborn as sns
 
 from PIL import Image
+from scipy.ndimage import rotate
 
 
 def alter_image_shapes_rotation(image, fragments_size_fraction=50, offset_ratio=0.25, shape_type="circle", shape_rotation=False, fragment_rotation=False):
@@ -56,8 +57,7 @@ def alter_image_shapes_rotation(image, fragments_size_fraction=50, offset_ratio=
             fragment_width = end_col - j
 
             # Generate the mask for the specified shape
-            mask = generate_shape_mask(fragment_height, fragment_width, shape_type,
-                                       shape_rotation=shape_rotation)
+            mask = generate_shape_mask(fragment_height, fragment_width, shape_type, shape_rotation=shape_rotation)
 
             # Extract the fragment
             fragment = arr[i:end_row, j:end_col]
@@ -407,9 +407,6 @@ def alter_image_boxes(image, num_rectangles=20, magnitude=1):
         rect_width = np.random.randint(cols // 50, cols // 20) * 2
         rect_height = np.random.randint(rows // 50, rows // 20) * 2
         
-#        rect_width = np.random.randint(cols // 20, cols // 4)
-#        rect_height = np.random.randint(rows // 20, rows // 4)
-
         # Choose a random starting point for the rectangle
         start_x = np.random.randint(0, cols - rect_width)
         start_y = np.random.randint(0, rows - rect_height)
@@ -438,3 +435,57 @@ def alter_image_boxes(image, num_rectangles=20, magnitude=1):
     return altered_img
 
 
+def alter_image_boxes_rotation(image, num_rectangles=20, magnitude=1, rotation_range=0):
+    """
+    Alters an image by moving and optionally rotating random rectangles.
+
+    Parameters:
+        image (PIL.Image): Input image.
+        num_rectangles (int): Number of rectangles to alter.
+        magnitude (float): Factor determining how much rectangles move towards the center.
+        rotation_range (int): Maximum rotation angle in degrees for rectangles (default: 0).
+                             If set to 0, no rotation is applied.
+
+    Returns:
+        PIL.Image: The altered image.
+    """
+    # Convert image to an array
+    img_array = np.array(image)
+    rows, cols, channels = img_array.shape
+
+    for _ in range(num_rectangles):
+        # Determine rectangle dimensions
+        rect_width = np.random.randint(cols // 50, cols // 20) * 2
+        rect_height = np.random.randint(rows // 50, rows // 20) * 2
+
+        # Choose a random starting point for the rectangle
+        start_x = np.random.randint(0, cols - rect_width)
+        start_y = np.random.randint(0, rows - rect_height)
+
+        # Extract the rectangle
+        rectangle = img_array[start_y:start_y + rect_height, start_x:start_x + rect_width].copy()
+
+        # Optionally rotate the rectangle
+        # angle = np.random.uniform(0, rotation_range)  # Random angle within the range
+        angle = np.random.uniform(rotation_range-2, rotation_range+2)  # Random angle within the range
+        rectangle = rotate(rectangle, angle, reshape=False, mode='reflect')  # Rotate the fragment
+
+        # Determine the direction to move (towards center)
+        center_x, center_y = cols // 2, rows // 2
+        shift_x = -(center_x - start_x) // 20
+        shift_y = -(center_y - start_y) // 20
+
+        # New position to paste rectangle
+        new_x = int(start_x + shift_x * magnitude)
+        new_y = int(start_y + shift_y * magnitude)
+
+        # Ensure the new position doesn't go out of the image bounds
+        new_x = min(max(new_x, 0), cols - rect_width)
+        new_y = min(max(new_y, 0), rows - rect_height)
+
+        # Paste the rectangle back into the image at the new position
+        img_array[new_y:new_y + rect_height, new_x:new_x + rect_width] = rectangle
+
+    # Convert array back to image
+    altered_img = Image.fromarray(img_array)
+    return altered_img
