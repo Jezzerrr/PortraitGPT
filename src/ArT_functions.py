@@ -10,15 +10,322 @@ import seaborn as sns
 from PIL import Image
 
 
-def alter_image_init(image, num_rectangles=20):
+def alter_image_shapes_rotation(image, fragments_size_fraction=50, offset_ratio=0.25, shape_type="circle", shape_rotation=False, fragment_rotation=False):
+    """
+    Alter an image by fragmenting it into shapes and applying optional transformations.
+
+    Parameters:
+        image (PIL.Image): Input image.
+        fragments_size_fraction (int): Number of fragments across the width.
+        offset_ratio (float): Maximum offset ratio for fragment displacement.
+        shape_type (str): Type of shape to use ("circle", "square", "diamond", "triangle", "pentagon").
+        shape_rotation (bool): If True, shapes will be randomly rotated.
+        fragment_rotation (bool): If True, cut-out fragments will be rotated before pasting.
+
+    Returns:
+        PIL.Image: The altered image.
+    """
+    arr = np.array(image)
+    rows, cols, _ = arr.shape
+
+    fragment_size = cols // fragments_size_fraction
+    offset_max = int(fragment_size * offset_ratio)
+
+    # Create an output array (copy of the original image)
+    fragmented_arr = arr.copy()
+
+    # Iterate over the array in blocks
+    for i in range(0, rows, fragment_size):
+        for j in range(0, cols, fragment_size):
+            # Define the fragment boundaries
+            end_row = min(i + fragment_size, rows)
+            end_col = min(j + fragment_size, cols)
+
+            # Random offset for the fragment
+            offset_row = np.random.randint(-offset_max, offset_max + 1)
+            offset_col = np.random.randint(-offset_max, offset_max + 1)
+
+            # Make sure the offset doesn't move the fragment out of the image boundaries
+            start_row_output = max(0, min(rows, i + offset_row))
+            start_col_output = max(0, min(cols, j + offset_col))
+            end_row_output = max(0, min(rows, start_row_output + (end_row - i)))
+            end_col_output = max(0, min(cols, start_col_output + (end_col - j)))
+
+            # Calculate actual fragment dimensions
+            fragment_height = end_row - i
+            fragment_width = end_col - j
+
+            # Generate the mask for the specified shape
+            mask = generate_shape_mask(fragment_height, fragment_width, shape_type,
+                                       shape_rotation=shape_rotation)
+
+            # Extract the fragment
+            fragment = arr[i:end_row, j:end_col]
+
+            # If fragment_rotation is enabled, rotate the fragment
+            if fragment_rotation:
+                fragment = rotate_fragment(fragment, mask, angle=np.random.uniform(-15, 15))
+
+            # Extract the destination area
+            destination = fragmented_arr[start_row_output:end_row_output, start_col_output:end_col_output]
+
+            # Ensure the mask matches both the fragment and destination sizes
+            # Resize the mask to match the fragment size
+            if mask.shape != fragment.shape[:2]:
+                mask_resized = resize_to_shape(mask, fragment.shape[:2])
+            else:
+                mask_resized = mask
+
+            # Apply the resized mask to the fragment and copy to destination
+            destination[mask_resized] = fragment[mask_resized]
+
+    # Create the output image from the array
+    fragmented_img = Image.fromarray(fragmented_arr)
+    return fragmented_img
+
+
+def generate_shape_mask(height, width, shape_type, shape_rotation=False):
+    """
+    Generate a mask for a given shape type, optionally rotated.
+    """
+    yy, xx = np.ogrid[:height, :width]
+    center_y, center_x = height // 2, width // 2
+    mask = np.zeros((height, width), dtype=bool)
+
+    if shape_type == "circle":
+        radius = min(center_x, center_y)
+        mask = (xx - center_x) ** 2 + (yy - center_y) ** 2 <= radius ** 2
+
+    elif shape_type == "square":
+        side = min(height, width)
+        mask[:side, :side] = True
+
+    elif shape_type == "diamond":
+        mask = abs(xx - center_x) + abs(yy - center_y) <= min(center_x, center_y)
+
+    elif shape_type == "triangle":
+        for y in range(height):
+            mask[y, center_x - y // 2: center_x + y // 2 + 1] = True
+
+    elif shape_type == "pentagon":
+        # Approximate a pentagon using a circular base and a truncated top
+        radius = min(center_x, center_y)
+        mask_circle = (xx - center_x) ** 2 + (yy - center_y) ** 2 <= radius ** 2
+        mask_top = yy < center_y
+        mask = mask_circle & mask_top
+
+    else:
+        raise ValueError(f"Unsupported shape type: {shape_type}")
+
+    # If shape_rotation is enabled, apply random rotation
+    if shape_rotation:
+        angle = np.random.uniform(0, 360)
+        mask = rotate_mask(mask, angle)
+
+    return mask
+
+
+def rotate_mask(mask, angle):
+    """
+    Rotate a mask array by a given angle (degrees).
+    """
+    mask_img = Image.fromarray(mask.astype(np.uint8) * 255)  # Convert to PIL image
+    mask_img = mask_img.rotate(angle, expand=True, resample=Image.BILINEAR)  # Rotate the mask
+    return np.array(mask_img) > 128  # Convert back to a boolean array
+
+
+def rotate_fragment(fragment, mask, angle):
+    """
+    Rotate a fragment array and its corresponding mask by a given angle (degrees).
+    """
+    fragment_img = Image.fromarray(fragment)  # Convert fragment to PIL image
+    mask_img = Image.fromarray(mask.astype(np.uint8) * 255)  # Convert mask to image
+
+    # Rotate both fragment and mask with expand=True
+    rotated_fragment = fragment_img.rotate(angle, resample=Image.BICUBIC, expand=True)
+    rotated_mask = mask_img.rotate(angle, resample=Image.BILINEAR, expand=True)
+
+    # Convert rotated mask back to binary format
+    rotated_mask_arr = np.array(rotated_mask) > 128
+    rotated_fragment_arr = np.array(rotated_fragment)
+
+    # Crop/resize rotated outputs to match original fragment dimensions
+    rotated_fragment_cropped = resize_to_shape(rotated_fragment_arr, fragment.shape[:2])
+    rotated_mask_cropped = resize_to_shape(rotated_mask_arr, fragment.shape[:2])
+
+    # Apply rotated mask to rotated fragment
+    rotated_fragment_cropped[~rotated_mask_cropped] = 0
+    return rotated_fragment_cropped
+
+
+def resize_to_shape_old(array, target_shape):
+    """
+    Resize a 2D or 3D array to the target shape.
+    """
+    img = Image.fromarray(array)
+    return np.array(img.resize((target_shape[1], target_shape[0]), resample=Image.BILINEAR if array.ndim == 2 else Image.NEAREST))
+
+
+def resize_to_shape(array, target_shape):
+    """
+    Resize a 2D array (mask) to the target shape.
+    """
+    img = Image.fromarray(array.astype(np.uint8) * 255)
+    resized = img.resize((target_shape[1], target_shape[0]), resample=Image.NEAREST)
+    return np.array(resized) > 128
+
+
+def alter_image_shapes_old(image, fragments_size_fraction=50, offset_ratio=0.25, shape_type="circle"):
+    """
+    shape types: circle, square, diamond, triangle, pentagon
+    """
+    arr = np.array(image)
+    rows, cols, _ = arr.shape
+
+    fragment_size = cols // fragments_size_fraction
+    offset_max = int(fragment_size * offset_ratio)
+
+    fragmented_arr = arr.copy()
+
+    # Iterate over the array in blocks
+    for i in range(0, rows, fragment_size):
+        for j in range(0, cols, fragment_size):
+            # Define the fragment boundaries
+            end_row = min(i + fragment_size, rows)
+            end_col = min(j + fragment_size, cols)
+
+            # Random offset for the fragment
+            offset_row = np.random.randint(-offset_max, offset_max + 1)
+            offset_col = np.random.randint(-offset_max, offset_max + 1)
+
+            # Make sure the offset doesn't move the fragment out of the image boundaries
+            start_row_output = max(0, min(rows, i + offset_row))
+            start_col_output = max(0, min(cols, j + offset_col))
+            end_row_output = max(0, min(rows, start_row_output + (end_row - i)))
+            end_col_output = max(0, min(cols, start_col_output + (end_col - j)))
+
+            # Calculate actual fragment dimensions
+            fragment_height = end_row - i
+            fragment_width = end_col - j
+
+            # Generate the mask for the specified shape
+            mask = generate_shape_mask_old(fragment_height, fragment_width, shape_type)
+
+            # Extract the fragment and destination
+            fragment = arr[i:end_row, j:end_col]
+            destination = fragmented_arr[start_row_output:end_row_output, start_col_output:end_col_output]
+
+            # Ensure the mask matches both the fragment and destination sizes
+            if fragment.shape[:2] == destination.shape[:2]:
+                destination[mask] = fragment[mask]
+
+    # Create the output image from the array
+    fragmented_img = Image.fromarray(fragmented_arr)
+    return fragmented_img
+
+
+def generate_shape_mask_old(height, width, shape_type):
+    """
+    Generate a mask for a given shape type.
+    """
+    yy, xx = np.ogrid[:height, :width]
+    center_y, center_x = height // 2, width // 2
+    mask = np.zeros((height, width), dtype=bool)
+
+    if shape_type == "circle":
+        radius = min(center_x, center_y)
+        mask = (xx - center_x) ** 2 + (yy - center_y) ** 2 <= radius ** 2
+
+    elif shape_type == "square":
+        side = min(height, width)
+        mask[:side, :side] = True
+
+    elif shape_type == "diamond":
+        mask = abs(xx - center_x) + abs(yy - center_y) <= min(center_x, center_y)
+
+    elif shape_type == "triangle":
+        for y in range(height):
+            mask[y, center_x - y // 2 : center_x + y // 2 + 1] = True
+
+    elif shape_type == "pentagon":
+        # Approximate a pentagon using a circular base and a truncated top
+        radius = min(center_x, center_y)
+        mask_circle = (xx - center_x) ** 2 + (yy - center_y) ** 2 <= radius ** 2
+        mask_top = yy < center_y
+        mask = mask_circle & mask_top
+
+    else:
+        raise ValueError(f"Unsupported shape type: {shape_type}")
+
+    return mask
+
+
+def alter_image_init_circles(image, num_fragments=50, offset_ratio=0.25):
     # Prepare to fragment the image
     arr = np.array(image)
     fragment_size = 20  # Size of each fragment block
     offset_max = 5  # Maximum offset to move fragments
-    
+
     # Get dimensions
     rows, cols, _ = arr.shape
-    
+
+    fragment_size = cols // num_fragments
+    offset_max = int(fragment_size * offset_ratio)
+
+    # Create an output array (copy of the original image)
+    fragmented_arr = arr.copy()
+
+    # Iterate over the array in blocks
+    for i in range(0, rows, fragment_size):
+        for j in range(0, cols, fragment_size):
+            # Define the fragment boundaries
+            end_row = min(i + fragment_size, rows)
+            end_col = min(j + fragment_size, cols)
+
+            # Random offset for the fragment
+            offset_row = np.random.randint(-offset_max, offset_max + 1)
+            offset_col = np.random.randint(-offset_max, offset_max + 1)
+
+            # Make sure the offset doesn't move the fragment out of the image boundaries
+            start_row_output = max(0, min(rows, i + offset_row))
+            start_col_output = max(0, min(cols, j + offset_col))
+            end_row_output = max(0, min(rows, start_row_output + (end_row - i)))
+            end_col_output = max(0, min(cols, start_col_output + (end_col - j)))
+
+            # Calculate actual fragment dimensions
+            fragment_height = end_row - i
+            fragment_width = end_col - j
+
+            # Adjust the circular mask to match the fragment's size
+            yy, xx = np.ogrid[:fragment_height, :fragment_width]
+            center_y, center_x = fragment_height // 2, fragment_width // 2
+            circular_mask = (xx - center_x) ** 2 + (yy - center_y) ** 2 <= (min(center_x, center_y) ** 2)
+
+            # Extract the fragment and destination
+            fragment = arr[i:end_row, j:end_col]
+            destination = fragmented_arr[start_row_output:end_row_output, start_col_output:end_col_output]
+
+            # Ensure the mask matches both the fragment and destination sizes
+            if fragment.shape[:2] == destination.shape[:2]:
+                destination[circular_mask] = fragment[circular_mask]
+
+    # Create the output image from the array
+    fragmented_img = Image.fromarray(fragmented_arr)
+    return fragmented_img
+
+
+def alter_image_init(image, num_fragments=50, offset_ratio=0.25):
+    # Prepare to fragment the image
+    arr = np.array(image)
+    fragment_size = 20  # Size of each fragment block
+    offset_max = 5  # Maximum offset to move fragments
+
+    # Get dimensions
+    rows, cols, _ = arr.shape
+
+    fragment_size = cols // num_fragments
+    offset_max = int(fragment_size // offset_ratio)
+
     # Create an output array (of zeros)
     # fragmented_arr = np.zeros_like(arr)
     fragmented_arr = arr.copy()
@@ -95,7 +402,6 @@ def alter_image_boxes(image, num_rectangles=20, magnitude=1):
     img_array = np.array(image)
     rows, cols, channels = img_array.shape
 
-    # For each rectangle
     for _ in range(num_rectangles):
         # Determine smaller dimensions for the rectangle based on image size
         rect_width = np.random.randint(cols // 50, cols // 20) * 2
