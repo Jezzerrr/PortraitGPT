@@ -19,8 +19,9 @@ def alter_image_init(image, num_rectangles=20):
     # Get dimensions
     rows, cols, _ = arr.shape
     
-    # Create an output array of zeros
-    fragmented_arr = np.zeros_like(arr)
+    # Create an output array (of zeros)
+    # fragmented_arr = np.zeros_like(arr)
+    fragmented_arr = arr.copy()
     
     # Iterate over the array in blocks
     for i in range(0, rows, fragment_size):
@@ -89,7 +90,7 @@ def alter_image_boxes_away_from_center(image, num_rectangles=20):
     return altered_img
 
 
-def alter_image_boxes(image, num_rectangles=20):
+def alter_image_boxes(image, num_rectangles=20, magnitude=1):
     # Convert image to an array
     img_array = np.array(image)
     rows, cols, channels = img_array.shape
@@ -116,8 +117,8 @@ def alter_image_boxes(image, num_rectangles=20):
         shift_y = -(center_y - start_y) // 20
 
         # New position to paste rectangle
-        new_x = start_x + shift_x
-        new_y = start_y + shift_y
+        new_x = int(start_x + shift_x * magnitude)
+        new_y = int(start_y + shift_y * magnitude)
 
         # Ensure the new position doesn't go out of the image bounds
         new_x = min(max(new_x, 0), cols - rect_width)

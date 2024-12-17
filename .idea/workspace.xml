@@ -5,57 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e428f1c4-7e7f-42b6-8545-2a47d7585966" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/PortraitGPT.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ArT_functions.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ArT_profile_picture.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/First prompt.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/input/002_presSeries-500x250.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/input/1000_F_561891054_gE7jq4E6raHL0x44MnGZQBiAhYLPFmQh.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/input/1705_JesseMetz1439.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/input/1a032a74-193c-4c7d-9388-06a76edf95bd.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/input/colors, comic.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/input/ee9c7076d4d02063b5bcaf07408f5ad0.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/input/foto_voorbeeld.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/gpt generated/1.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/gpt generated/2.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/gpt generated/3.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/gpt generated/4.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/gpt generated/cubist_style_image_corrected_contours_blended.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/gpt generated/cubist_style_image_corrected_enhanced.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/gpt generated/cubist_style_image_corrected_features_preserved.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/background_removed.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/comic_art_img.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/cubist_style_image.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/cubist_style_image_enhanced.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_10.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_11.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_12.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_13.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_14.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_15.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_4.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_5.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_6.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_7.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/fragmented_image_9.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/pop_art_style.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output/old/shapes_img.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ArT_functions.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/comic_book.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/general_functions.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tempy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArT_profile_picture.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ArT_profile_picture.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ArT_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArT_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/general_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/general_functions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -39,7 +39,7 @@ def decrease_image_size(img, target_size):
     return img_resized
 
 
-def save_image_with_unique_name(img, output_base_path):
+def save_image_with_unique_name(img, output_base_path='output/output_image.jpg'):
     # Check if the file exists and create a unique name
     count = 0
     output_image_path = output_base_path
