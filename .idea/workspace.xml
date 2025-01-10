@@ -8,7 +8,49 @@
       <change beforePath="$PROJECT_DIR$/.idea/PortraitGPT.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PortraitGPT.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ArT_profile_picture.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ArT_profile_picture.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_10.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_11.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_12.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_13.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_14.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_15.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_16.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_17.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_18.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_19.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_20.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_21.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_22.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_23.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_24.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_25.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_26.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_27.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_28.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_29.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_30.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_31.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_32.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_33.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_34.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_35.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_36.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_37.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_38.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_39.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_4.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_40.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_5.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_6.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_7.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_8.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/output_image_9.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ArT_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArT_functions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -26,18 +68,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Jezzerrr"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Jezzerrr&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Jezzerrr/PortraitGPT.git",
-    "accountId": "1befb632-4fc7-41b9-ac01-e05bf04534f6"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Jezzerrr/PortraitGPT.git&quot;,
+    &quot;accountId&quot;: &quot;1befb632-4fc7-41b9-ac01-e05bf04534f6&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -47,15 +89,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.tempy.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/jjmet/Desktop/code_art/PortraitGPT"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.tempy.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/jjmet/Desktop/code_art/PortraitGPT&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="tempy" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="PortraitGPT" />
@@ -88,7 +130,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-fb887030ada0-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.21565.199" />
+        <option value="bundled-python-sdk-0509580d9d50-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.14494.241" />
       </set>
     </attachedChunks>
   </component>
