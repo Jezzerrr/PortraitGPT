@@ -656,6 +656,10 @@ def alter_image_shapes_with_border_expansion(
         angle = np.random.uniform(rotation_mean - rotation_var, rotation_mean + rotation_var)
         shape_mask = create_shape_mask(shape_type, shape_width, shape_height, angle)
 
+        # Resize the mask to match the region size (in case rotation altered its dimensions)
+        shape_mask = Image.fromarray(shape_mask).resize((shape_width, shape_height), resample=Image.NEAREST)
+        shape_mask = np.array(shape_mask)
+
         # Apply the mask to extract the desired shape
         shape = np.zeros_like(region)
         for c in range(channels):

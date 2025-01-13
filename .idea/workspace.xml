@@ -5,52 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e428f1c4-7e7f-42b6-8545-2a47d7585966" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/PortraitGPT.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PortraitGPT.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ArT_profile_picture.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ArT_profile_picture.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_10.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_11.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_12.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_13.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_14.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_15.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_16.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_17.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_18.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_19.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_2.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_20.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_21.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_22.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_23.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_24.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_25.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_26.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_27.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_28.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_29.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_3.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_30.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_31.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_32.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_33.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_34.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_35.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_36.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_37.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_38.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_39.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_4.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_40.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_5.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_6.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_7.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_8.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/output_image_9.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ArT_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArT_functions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
