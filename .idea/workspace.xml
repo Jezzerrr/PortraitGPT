@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e428f1c4-7e7f-42b6-8545-2a47d7585966" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/move_shapes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/PortraitGPT.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PortraitGPT.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ArT_profile_picture.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ArT_profile_picture.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ArT_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArT_functions.py" afterDir="false" />
     </list>

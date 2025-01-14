@@ -11,265 +11,6 @@ from PIL import Image, ImageDraw
 from scipy.ndimage import rotate
 
 
-def alter_image_shapes_rotation(image, fragments_size_fraction=50, offset_ratio=0.25, shape_type="circle", shape_rotation=False, fragment_rotation=False):
-    """
-    Alter an image by fragmenting it into shapes and applying optional transformations.
-
-    Parameters:
-        image (PIL.Image): Input image.
-        fragments_size_fraction (int): Number of fragments across the width.
-        offset_ratio (float): Maximum offset ratio for fragment displacement.
-        shape_type (str): Type of shape to use ("circle", "square", "diamond", "triangle", "pentagon").
-        shape_rotation (bool): If True, shapes will be randomly rotated.
-        fragment_rotation (bool): If True, cut-out fragments will be rotated before pasting.
-
-    Returns:
-        PIL.Image: The altered image.
-    """
-    arr = np.array(image)
-    rows, cols, _ = arr.shape
-
-    fragment_size = cols // fragments_size_fraction
-    offset_max = int(fragment_size * offset_ratio)
-
-    # Create an output array (copy of the original image)
-    fragmented_arr = arr.copy()
-
-    # Iterate over the array in blocks
-    for i in range(0, rows, fragment_size):
-        for j in range(0, cols, fragment_size):
-            # Define the fragment boundaries
-            end_row = min(i + fragment_size, rows)
-            end_col = min(j + fragment_size, cols)
-
-            # Random offset for the fragment
-            offset_row = np.random.randint(-offset_max, offset_max + 1)
-            offset_col = np.random.randint(-offset_max, offset_max + 1)
-
-            # Make sure the offset doesn't move the fragment out of the image boundaries
-            start_row_output = max(0, min(rows, i + offset_row))
-            start_col_output = max(0, min(cols, j + offset_col))
-            end_row_output = max(0, min(rows, start_row_output + (end_row - i)))
-            end_col_output = max(0, min(cols, start_col_output + (end_col - j)))
-
-            # Calculate actual fragment dimensions
-            fragment_height = end_row - i
-            fragment_width = end_col - j
-
-            # Generate the mask for the specified shape
-            mask = generate_shape_mask(fragment_height, fragment_width, shape_type, shape_rotation=shape_rotation)
-
-            # Extract the fragment
-            fragment = arr[i:end_row, j:end_col]
-
-            # If fragment_rotation is enabled, rotate the fragment
-            if fragment_rotation:
-                fragment = rotate_fragment(fragment, mask, angle=np.random.uniform(-15, 15))
-
-            # Extract the destination area
-            destination = fragmented_arr[start_row_output:end_row_output, start_col_output:end_col_output]
-
-            # Ensure the mask matches both the fragment and destination sizes
-            # Resize the mask to match the fragment size
-            if mask.shape != fragment.shape[:2]:
-                mask_resized = resize_to_shape(mask, fragment.shape[:2])
-            else:
-                mask_resized = mask
-
-            # Apply the resized mask to the fragment and copy to destination
-            destination[mask_resized] = fragment[mask_resized]
-
-    # Create the output image from the array
-    fragmented_img = Image.fromarray(fragmented_arr)
-    return fragmented_img
-
-
-def generate_shape_mask(height, width, shape_type, shape_rotation=False):
-    """
-    Generate a mask for a given shape type, optionally rotated.
-    """
-    yy, xx = np.ogrid[:height, :width]
-    center_y, center_x = height // 2, width // 2
-    mask = np.zeros((height, width), dtype=bool)
-
-    if shape_type == "circle":
-        radius = min(center_x, center_y)
-        mask = (xx - center_x) ** 2 + (yy - center_y) ** 2 <= radius ** 2
-
-    elif shape_type == "square":
-        side = min(height, width)
-        mask[:side, :side] = True
-
-    elif shape_type == "diamond":
-        mask = abs(xx - center_x) + abs(yy - center_y) <= min(center_x, center_y)
-
-    elif shape_type == "triangle":
-        for y in range(height):
-            mask[y, center_x - y // 2: center_x + y // 2 + 1] = True
-
-    elif shape_type == "pentagon":
-        # Approximate a pentagon using a circular base and a truncated top
-        radius = min(center_x, center_y)
-        mask_circle = (xx - center_x) ** 2 + (yy - center_y) ** 2 <= radius ** 2
-        mask_top = yy < center_y
-        mask = mask_circle & mask_top
-
-    else:
-        raise ValueError(f"Unsupported shape type: {shape_type}")
-
-    # If shape_rotation is enabled, apply random rotation
-    if shape_rotation:
-        angle = np.random.uniform(0, 360)
-        mask = rotate_mask(mask, angle)
-
-    return mask
-
-
-def rotate_mask(mask, angle):
-    """
-    Rotate a mask array by a given angle (degrees).
-    """
-    mask_img = Image.fromarray(mask.astype(np.uint8) * 255)  # Convert to PIL image
-    mask_img = mask_img.rotate(angle, expand=True, resample=Image.BILINEAR)  # Rotate the mask
-    return np.array(mask_img) > 128  # Convert back to a boolean array
-
-
-def rotate_fragment(fragment, mask, angle):
-    """
-    Rotate a fragment array and its corresponding mask by a given angle (degrees).
-    """
-    fragment_img = Image.fromarray(fragment)  # Convert fragment to PIL image
-    mask_img = Image.fromarray(mask.astype(np.uint8) * 255)  # Convert mask to image
-
-    # Rotate both fragment and mask with expand=True
-    rotated_fragment = fragment_img.rotate(angle, resample=Image.BICUBIC, expand=True)
-    rotated_mask = mask_img.rotate(angle, resample=Image.BILINEAR, expand=True)
-
-    # Convert rotated mask back to binary format
-    rotated_mask_arr = np.array(rotated_mask) > 128
-    rotated_fragment_arr = np.array(rotated_fragment)
-
-    # Crop/resize rotated outputs to match original fragment dimensions
-    rotated_fragment_cropped = resize_to_shape(rotated_fragment_arr, fragment.shape[:2])
-    rotated_mask_cropped = resize_to_shape(rotated_mask_arr, fragment.shape[:2])
-
-    # Apply rotated mask to rotated fragment
-    rotated_fragment_cropped[~rotated_mask_cropped] = 0
-    return rotated_fragment_cropped
-
-
-def resize_to_shape_old(array, target_shape):
-    """
-    Resize a 2D or 3D array to the target shape.
-    """
-    img = Image.fromarray(array)
-    return np.array(img.resize((target_shape[1], target_shape[0]), resample=Image.BILINEAR if array.ndim == 2 else Image.NEAREST))
-
-
-def resize_to_shape(array, target_shape):
-    """
-    Resize a 2D array (mask) to the target shape.
-    """
-    img = Image.fromarray(array.astype(np.uint8) * 255)
-    resized = img.resize((target_shape[1], target_shape[0]), resample=Image.NEAREST)
-    return np.array(resized) > 128
-
-
-def alter_image_init_circles(image, num_fragments=50, offset_ratio=0.25):
-    # Prepare to fragment the image
-    arr = np.array(image)
-    fragment_size = 20  # Size of each fragment block
-    offset_max = 5  # Maximum offset to move fragments
-
-    # Get dimensions
-    rows, cols, _ = arr.shape
-
-    fragment_size = cols // num_fragments
-    offset_max = int(fragment_size * offset_ratio)
-
-    # Create an output array (copy of the original image)
-    fragmented_arr = arr.copy()
-
-    # Iterate over the array in blocks
-    for i in range(0, rows, fragment_size):
-        for j in range(0, cols, fragment_size):
-            # Define the fragment boundaries
-            end_row = min(i + fragment_size, rows)
-            end_col = min(j + fragment_size, cols)
-
-            # Random offset for the fragment
-            offset_row = np.random.randint(-offset_max, offset_max + 1)
-            offset_col = np.random.randint(-offset_max, offset_max + 1)
-
-            # Make sure the offset doesn't move the fragment out of the image boundaries
-            start_row_output = max(0, min(rows, i + offset_row))
-            start_col_output = max(0, min(cols, j + offset_col))
-            end_row_output = max(0, min(rows, start_row_output + (end_row - i)))
-            end_col_output = max(0, min(cols, start_col_output + (end_col - j)))
-
-            # Calculate actual fragment dimensions
-            fragment_height = end_row - i
-            fragment_width = end_col - j
-
-            # Adjust the circular mask to match the fragment's size
-            yy, xx = np.ogrid[:fragment_height, :fragment_width]
-            center_y, center_x = fragment_height // 2, fragment_width // 2
-            circular_mask = (xx - center_x) ** 2 + (yy - center_y) ** 2 <= (min(center_x, center_y) ** 2)
-
-            # Extract the fragment and destination
-            fragment = arr[i:end_row, j:end_col]
-            destination = fragmented_arr[start_row_output:end_row_output, start_col_output:end_col_output]
-
-            # Ensure the mask matches both the fragment and destination sizes
-            if fragment.shape[:2] == destination.shape[:2]:
-                destination[circular_mask] = fragment[circular_mask]
-
-    # Create the output image from the array
-    fragmented_img = Image.fromarray(fragmented_arr)
-    return fragmented_img
-
-
-def alter_image_init(image, num_fragments=50, offset_ratio=0.25):
-    # Prepare to fragment the image
-    arr = np.array(image)
-    fragment_size = 20  # Size of each fragment block
-    offset_max = 5  # Maximum offset to move fragments
-
-    # Get dimensions
-    rows, cols, _ = arr.shape
-
-    fragment_size = cols // num_fragments
-    offset_max = int(fragment_size // offset_ratio)
-
-    # Create an output array (of zeros)
-    # fragmented_arr = np.zeros_like(arr)
-    fragmented_arr = arr.copy()
-    
-    # Iterate over the array in blocks
-    for i in range(0, rows, fragment_size):
-        for j in range(0, cols, fragment_size):
-            # Define the fragment boundaries
-            end_row = min(i + fragment_size, rows)
-            end_col = min(j + fragment_size, cols)
-            
-            # Random offset for the fragment
-            offset_row = np.random.randint(-offset_max, offset_max + 1)
-            offset_col = np.random.randint(-offset_max, offset_max + 1)
-            
-            # Make sure the offset doesn't move the fragment out of the image boundaries
-            start_row_output = max(0, min(rows, i + offset_row))
-            start_col_output = max(0, min(cols, j + offset_col))
-            end_row_output = max(0, min(rows, end_row + offset_row))
-            end_col_output = max(0, min(cols, end_col + offset_col))
-            
-            # Copy the fragment to the output array with the random offset
-            fragmented_arr[start_row_output:end_row_output, start_col_output:end_col_output] = \
-                arr[i:end_row, j:end_col][:end_row_output - start_row_output, :end_col_output - start_col_output]
-
-    # Create the output image from the array
-    fragmented_img = Image.fromarray(fragmented_arr)
-    return fragmented_img
-
 
 def alter_image_boxes_away_from_center(image, num_rectangles=20):
     # Convert image to an array
@@ -343,62 +84,6 @@ def alter_image_boxes(image, num_rectangles=20, magnitude=1):
         new_y = min(max(new_y, 0), rows - rect_height)
 
         # Paste the rectangle back into the image a bit offset from its original position
-        img_array[new_y:new_y + rect_height, new_x:new_x + rect_width] = rectangle
-
-    # Convert array back to image
-    altered_img = Image.fromarray(img_array)
-    return altered_img
-
-
-def alter_image_boxes_rotation_basic(image, num_rectangles=20, magnitude=1, rotation_range=0):
-    """
-    Alters an image by moving and optionally rotating random rectangles.
-
-    Parameters:
-        image (PIL.Image): Input image.
-        num_rectangles (int): Number of rectangles to alter.
-        magnitude (float): Factor determining how much rectangles move towards the center.
-        rotation_range (int): Maximum rotation angle in degrees for rectangles (default: 0).
-                             If set to 0, no rotation is applied.
-
-    Returns:
-        PIL.Image: The altered image.
-    """
-    # Convert image to an array
-    img_array = np.array(image)
-    rows, cols, channels = img_array.shape
-
-    for _ in range(num_rectangles):
-        # Determine rectangle dimensions
-        rect_width = np.random.randint(cols // 50, cols // 20) * 2
-        rect_height = np.random.randint(rows // 50, rows // 20) * 2
-
-        # Choose a random starting point for the rectangle
-        start_x = np.random.randint(0, cols - rect_width)
-        start_y = np.random.randint(0, rows - rect_height)
-
-        # Extract the rectangle
-        rectangle = img_array[start_y:start_y + rect_height, start_x:start_x + rect_width].copy()
-
-        # Optionally rotate the rectangle
-        # angle = np.random.uniform(0, rotation_range)  # Random angle within the range
-        angle = np.random.uniform(rotation_range-2, rotation_range+2)  # Random angle within the range
-        rectangle = rotate(rectangle, angle, reshape=False, mode='reflect')  # Rotate the fragment
-
-        # Determine the direction to move (towards center)
-        center_x, center_y = cols // 2, rows // 2
-        shift_x = -(center_x - start_x) // 20
-        shift_y = -(center_y - start_y) // 20
-
-        # New position to paste rectangle
-        new_x = int(start_x + shift_x * magnitude)
-        new_y = int(start_y + shift_y * magnitude)
-
-        # Ensure the new position doesn't go out of the image bounds
-        new_x = min(max(new_x, 0), cols - rect_width)
-        new_y = min(max(new_y, 0), rows - rect_height)
-
-        # Paste the rectangle back into the image at the new position
         img_array[new_y:new_y + rect_height, new_x:new_x + rect_width] = rectangle
 
     # Convert array back to image
@@ -701,4 +386,156 @@ def alter_image_shapes_with_border_expansion(
 
     # Convert array back to image
     altered_img = Image.fromarray(cropped_array)
+    return altered_img
+
+
+
+def alter_image_boxes_rotation_2(image, shape_size=1, num_rectangles=20, magnitude_shift=1, rotation_range=0):
+    """
+    Alters an image by moving and optionally rotating random rectangles.
+
+    Parameters:
+        image (PIL.Image): Input image.
+        shape_size (int): Size multiplier for rectangles.
+        num_rectangles (int): Number of rectangles to alter.
+        magnitude_shift (float): Factor determining how much rectangles move towards the center.
+        rotation_range (int): Maximum rotation angle in degrees for rectangles.
+        Returns:
+        PIL.Image: The altered image.
+    """
+    # Convert image to an array
+    img_array = np.array(image)
+    rows, cols, channels = img_array.shape
+
+    for _ in range(num_rectangles):
+        # Determine rectangle dimensions
+        rect_width = np.random.randint(cols // 50, cols // 20) * 2 * shape_size
+        rect_height = np.random.randint(rows // 50, rows // 20) * 2 * shape_size
+
+        # Choose a random starting point for the rectangle
+        start_x = np.random.randint(0, cols - rect_width)
+        start_y = np.random.randint(0, rows - rect_height)
+
+        # Extract the rectangle
+        rectangle = img_array[start_y:start_y + rect_height, start_x:start_x + rect_width].copy()
+
+        # Optionally rotate the rectangle
+        angle = np.random.uniform(-rotation_range, rotation_range)  # Random angle within the range
+        rotated_rectangle = rotate(rectangle, angle, reshape=False, mode='reflect')  # Rotate the fragment
+
+        # Determine the direction to move (towards center)
+        center_x, center_y = cols // 2, rows // 2
+        shift_x = -(center_x - start_x) // 20
+        shift_y = -(center_y - start_y) // 20
+
+        # New position to paste rectangle
+        new_x = int(start_x + shift_x * magnitude_shift)
+        new_y = int(start_y + shift_y * magnitude_shift)
+
+        # Ensure the new position stays within the image bounds
+        new_x = min(max(new_x, 0), cols - rect_width)
+        new_y = min(max(new_y, 0), rows - rect_height)
+
+        # Handle edge cases by cropping the rotated rectangle if it goes out of bounds
+        paste_x_start = max(0, new_x)
+        paste_y_start = max(0, new_y)
+        paste_x_end = min(new_x + rect_width, cols)
+        paste_y_end = min(new_y + rect_height, rows)
+
+        crop_x_start = paste_x_start - new_x
+        crop_y_start = paste_y_start - new_y
+        crop_x_end = crop_x_start + (paste_x_end - paste_x_start)
+        crop_y_end = crop_y_start + (paste_y_end - paste_y_start)
+
+        # Crop the rotated rectangle to fit within the image
+        cropped_rotated_rectangle = rotated_rectangle[crop_y_start:crop_y_end, crop_x_start:crop_x_end]
+
+        # Paste the cropped rectangle back into the image
+        img_array[paste_y_start:paste_y_end, paste_x_start:paste_x_end] = cropped_rotated_rectangle
+
+    # Convert array back to image
+    altered_img = Image.fromarray(img_array)
+    return altered_img
+
+
+def alter_image_boxes_rotation_3(
+    image, shape_size=1, num_rectangles=20, magnitude_shift=1, rotation_range=0, border_thickness=3
+):
+    """
+    Alters an image by moving, rotating, and adding black borders to random rectangles.
+
+    Parameters:
+        image (PIL.Image): Input image.
+        shape_size (int): Size multiplier for rectangles.
+        num_rectangles (int): Number of rectangles to alter.
+        magnitude_shift (float): Factor determining how much rectangles move towards the center.
+        rotation_range (int): Maximum rotation angle in degrees for rectangles.
+        border_thickness (int): Thickness of the black border around rectangles.
+
+    Returns:
+        PIL.Image: The altered image.
+    """
+    # Convert image to an array
+    img_array = np.array(image)
+    rows, cols, channels = img_array.shape
+
+    for _ in range(num_rectangles):
+        # Determine rectangle dimensions
+        rect_width = np.random.randint(cols // 50, cols // 20) * 2 * shape_size
+        rect_height = np.random.randint(rows // 50, rows // 20) * 2 * shape_size
+
+        # Choose a random starting point for the rectangle
+        start_x = np.random.randint(0, cols - rect_width)
+        start_y = np.random.randint(0, rows - rect_height)
+
+        # Extract the rectangle
+        rectangle = img_array[start_y:start_y + rect_height, start_x:start_x + rect_width].copy()
+
+        # Optionally rotate the rectangle
+        angle = np.random.uniform(rotation_range, rotation_range)  # Random angle within the range
+        rotated_rectangle = rotate(rectangle, angle, reshape=False, mode='reflect')  # Rotate the fragment
+
+        # Add a black border to the rotated rectangle
+        bordered_rectangle = np.zeros(
+            (rotated_rectangle.shape[0] + 2 * border_thickness,
+             rotated_rectangle.shape[1] + 2 * border_thickness,
+             channels),
+            dtype=np.uint8,
+        )
+        bordered_rectangle[
+            border_thickness:-border_thickness, border_thickness:-border_thickness
+        ] = rotated_rectangle
+
+        # Determine the direction to move (towards center)
+        center_x, center_y = cols // 2, rows // 2
+        shift_x = -(center_x - start_x) // 20
+        shift_y = -(center_y - start_y) // 20
+
+        # New position to paste rectangle
+        new_x = int(start_x + shift_x * magnitude_shift)
+        new_y = int(start_y + shift_y * magnitude_shift)
+
+        # Ensure the new position stays within the image bounds
+        new_x = min(max(new_x, 0), cols - rect_width)
+        new_y = min(max(new_y, 0), rows - rect_height)
+
+        # Handle edge cases by cropping the bordered rectangle if it goes out of bounds
+        paste_x_start = max(0, new_x)
+        paste_y_start = max(0, new_y)
+        paste_x_end = min(new_x + rect_width + 2 * border_thickness, cols)
+        paste_y_end = min(new_y + rect_height + 2 * border_thickness, rows)
+
+        crop_x_start = paste_x_start - new_x
+        crop_y_start = paste_y_start - new_y
+        crop_x_end = crop_x_start + (paste_x_end - paste_x_start)
+        crop_y_end = crop_y_start + (paste_y_end - paste_y_start)
+
+        # Crop the bordered rectangle to fit within the image
+        cropped_bordered_rectangle = bordered_rectangle[crop_y_start:crop_y_end, crop_x_start:crop_x_end]
+
+        # Paste the cropped bordered rectangle back into the image
+        img_array[paste_y_start:paste_y_end, paste_x_start:paste_x_end] = cropped_bordered_rectangle
+
+    # Convert array back to image
+    altered_img = Image.fromarray(img_array)
     return altered_img
