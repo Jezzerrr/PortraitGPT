@@ -8,8 +8,10 @@ import os
 import seaborn as sns
 
 from PIL import Image, ImageDraw
-from scipy.ndimage import rotate
+from scipy.ndimage import rotate as scipy_rotate
 
+from skimage.transform import rotate
+from PIL import Image
 
 
 def alter_image_boxes_away_from_center(image, num_rectangles=20):
@@ -130,7 +132,7 @@ def alter_image_boxes_rotation(
 
         # Optionally rotate the rectangle
         angle = np.random.uniform(rotation_mean - rotation_var, rotation_mean + rotation_var)  # Random angle within the range
-        rotated_rectangle = rotate(rectangle, angle, reshape=False, mode='reflect')  # Rotate the fragment
+        rotated_rectangle = scipy_rotate(rectangle, angle, reshape=False, mode='reflect')  # Rotate the fragment
 
         # Determine the direction to move (towards center)
         center_x, center_y = cols // 2, rows // 2
@@ -389,88 +391,26 @@ def alter_image_shapes_with_border_expansion(
     return altered_img
 
 
-
-def alter_image_boxes_rotation_2(image, shape_size=1, num_rectangles=20, magnitude_shift=1, rotation_range=0):
-    """
-    Alters an image by moving and optionally rotating random rectangles.
-
-    Parameters:
-        image (PIL.Image): Input image.
-        shape_size (int): Size multiplier for rectangles.
-        num_rectangles (int): Number of rectangles to alter.
-        magnitude_shift (float): Factor determining how much rectangles move towards the center.
-        rotation_range (int): Maximum rotation angle in degrees for rectangles.
-        Returns:
-        PIL.Image: The altered image.
-    """
-    # Convert image to an array
-    img_array = np.array(image)
-    rows, cols, channels = img_array.shape
-
-    for _ in range(num_rectangles):
-        # Determine rectangle dimensions
-        rect_width = np.random.randint(cols // 50, cols // 20) * 2 * shape_size
-        rect_height = np.random.randint(rows // 50, rows // 20) * 2 * shape_size
-
-        # Choose a random starting point for the rectangle
-        start_x = np.random.randint(0, cols - rect_width)
-        start_y = np.random.randint(0, rows - rect_height)
-
-        # Extract the rectangle
-        rectangle = img_array[start_y:start_y + rect_height, start_x:start_x + rect_width].copy()
-
-        # Optionally rotate the rectangle
-        angle = np.random.uniform(-rotation_range, rotation_range)  # Random angle within the range
-        rotated_rectangle = rotate(rectangle, angle, reshape=False, mode='reflect')  # Rotate the fragment
-
-        # Determine the direction to move (towards center)
-        center_x, center_y = cols // 2, rows // 2
-        shift_x = -(center_x - start_x) // 20
-        shift_y = -(center_y - start_y) // 20
-
-        # New position to paste rectangle
-        new_x = int(start_x + shift_x * magnitude_shift)
-        new_y = int(start_y + shift_y * magnitude_shift)
-
-        # Ensure the new position stays within the image bounds
-        new_x = min(max(new_x, 0), cols - rect_width)
-        new_y = min(max(new_y, 0), rows - rect_height)
-
-        # Handle edge cases by cropping the rotated rectangle if it goes out of bounds
-        paste_x_start = max(0, new_x)
-        paste_y_start = max(0, new_y)
-        paste_x_end = min(new_x + rect_width, cols)
-        paste_y_end = min(new_y + rect_height, rows)
-
-        crop_x_start = paste_x_start - new_x
-        crop_y_start = paste_y_start - new_y
-        crop_x_end = crop_x_start + (paste_x_end - paste_x_start)
-        crop_y_end = crop_y_start + (paste_y_end - paste_y_start)
-
-        # Crop the rotated rectangle to fit within the image
-        cropped_rotated_rectangle = rotated_rectangle[crop_y_start:crop_y_end, crop_x_start:crop_x_end]
-
-        # Paste the cropped rectangle back into the image
-        img_array[paste_y_start:paste_y_end, paste_x_start:paste_x_end] = cropped_rotated_rectangle
-
-    # Convert array back to image
-    altered_img = Image.fromarray(img_array)
-    return altered_img
-
-
-def alter_image_boxes_rotation_3(
-    image, shape_size=1, num_rectangles=20, magnitude_shift=1, rotation_range=0, border_thickness=3
+def alter_image_shapes_with_border_expansion_2(
+        image,
+        shape_type="rectangle",
+        shape_size=1,
+        num_shapes=20,
+        magnitude_shift=1,
+        rotation_mean=0,
+        rotation_var=0
 ):
     """
-    Alters an image by moving, rotating, and adding black borders to random rectangles.
+    Alters an image by moving and rotating random shapes, ensuring shapes are sampled from the original area.
 
     Parameters:
         image (PIL.Image): Input image.
-        shape_size (int): Size multiplier for rectangles.
-        num_rectangles (int): Number of rectangles to alter.
-        magnitude_shift (float): Factor determining how much rectangles move towards the center.
-        rotation_range (int): Maximum rotation angle in degrees for rectangles.
-        border_thickness (int): Thickness of the black border around rectangles.
+        shape_type (str): Shape type ("circle", "rectangle", "diamond", "triangle", "pentagon").
+        shape_size (int): Size multiplier for shapes.
+        num_shapes (int): Number of shapes to alter.
+        magnitude_shift (float): Factor determining how much shapes move towards the center.
+        rotation_mean (int): Average rotation angle in degrees for the shapes.
+        rotation_var (int): Variation of the rotation angle in degrees for the shapes.
 
     Returns:
         PIL.Image: The altered image.
@@ -479,63 +419,70 @@ def alter_image_boxes_rotation_3(
     img_array = np.array(image)
     rows, cols, channels = img_array.shape
 
-    for _ in range(num_rectangles):
-        # Determine rectangle dimensions
-        rect_width = np.random.randint(cols // 50, cols // 20) * 2 * shape_size
-        rect_height = np.random.randint(rows // 50, rows // 20) * 2 * shape_size
+    # Add a temporary border (e.g., 20% of the image size)
+    border_size = max(rows, cols) // 5
+    padded_array = np.pad(img_array, ((border_size, border_size), (border_size, border_size), (0, 0)), mode='reflect')
+    padded_rows, padded_cols, _ = padded_array.shape
 
-        # Choose a random starting point for the rectangle
-        start_x = np.random.randint(0, cols - rect_width)
-        start_y = np.random.randint(0, rows - rect_height)
+    for _ in range(num_shapes):
+        # Determine shape dimensions
+        shape_width = np.random.randint(cols // 50, cols // 20) * 2 * shape_size
+        shape_height = np.random.randint(rows // 50, rows // 20) * 2 * shape_size
 
-        # Extract the rectangle
-        rectangle = img_array[start_y:start_y + rect_height, start_x:start_x + rect_width].copy()
+        # Choose a random starting point for the shape **within the original image area**
+        start_x = np.random.randint(border_size, border_size + cols - shape_width)
+        start_y = np.random.randint(border_size, border_size + rows - shape_height)
 
-        # Optionally rotate the rectangle
-        angle = np.random.uniform(rotation_range, rotation_range)  # Random angle within the range
-        rotated_rectangle = rotate(rectangle, angle, reshape=False, mode='reflect')  # Rotate the fragment
+        # Extract the region (from the padded array)
+        region = padded_array[start_y:start_y + shape_height, start_x:start_x + shape_width].copy()
 
-        # Add a black border to the rotated rectangle
-        bordered_rectangle = np.zeros(
-            (rotated_rectangle.shape[0] + 2 * border_thickness,
-             rotated_rectangle.shape[1] + 2 * border_thickness,
-             channels),
-            dtype=np.uint8,
-        )
-        bordered_rectangle[
-            border_thickness:-border_thickness, border_thickness:-border_thickness
-        ] = rotated_rectangle
+        # Create shape mask
+        shape_mask = create_shape_mask(shape_type, shape_width, shape_height)
+
+        # Apply the mask to extract the desired shape
+        shape = np.zeros_like(region)
+        for c in range(channels):
+            shape[..., c] = region[..., c] * (shape_mask // 255)
+
+        # Rotate AFTER extracting shape
+        angle = np.random.uniform(rotation_mean - rotation_var, rotation_mean + rotation_var)
+        rotated_shape = scipy_rotate(shape, angle, reshape=False, mode='reflect')  # Rotate the fragment
+        # rotated_shape = rotate(shape, angle=angle, mode="edge", preserve_range=True).astype(np.uint8)
 
         # Determine the direction to move (towards center)
-        center_x, center_y = cols // 2, rows // 2
+        center_x, center_y = padded_cols // 2, padded_rows // 2
         shift_x = -(center_x - start_x) // 20
         shift_y = -(center_y - start_y) // 20
 
-        # New position to paste rectangle
+        # New position to paste shape
         new_x = int(start_x + shift_x * magnitude_shift)
         new_y = int(start_y + shift_y * magnitude_shift)
 
-        # Ensure the new position stays within the image bounds
-        new_x = min(max(new_x, 0), cols - rect_width)
-        new_y = min(max(new_y, 0), rows - rect_height)
-
-        # Handle edge cases by cropping the bordered rectangle if it goes out of bounds
+        # Paste the rotated shape back into the padded image
         paste_x_start = max(0, new_x)
         paste_y_start = max(0, new_y)
-        paste_x_end = min(new_x + rect_width + 2 * border_thickness, cols)
-        paste_y_end = min(new_y + rect_height + 2 * border_thickness, rows)
+        paste_x_end = min(new_x + shape_width, padded_cols)
+        paste_y_end = min(new_y + shape_height, padded_rows)
 
         crop_x_start = paste_x_start - new_x
         crop_y_start = paste_y_start - new_y
         crop_x_end = crop_x_start + (paste_x_end - paste_x_start)
         crop_y_end = crop_y_start + (paste_y_end - paste_y_start)
 
-        # Crop the bordered rectangle to fit within the image
-        cropped_bordered_rectangle = bordered_rectangle[crop_y_start:crop_y_end, crop_x_start:crop_x_end]
+        # Crop the rotated shape to fit within the image
+        cropped_shape = rotated_shape[crop_y_start:crop_y_end, crop_x_start:crop_x_end]
 
-        # Paste the cropped bordered rectangle back into the image
-        img_array[paste_y_start:paste_y_end, paste_x_start:paste_x_end] = cropped_bordered_rectangle
+        # Paste the cropped shape back into the padded image
+        for c in range(channels):
+            padded_array[paste_y_start:paste_y_end, paste_x_start:paste_x_end, c] = np.where(
+                shape_mask[crop_y_start:crop_y_end, crop_x_start:crop_x_end] > 0,
+                cropped_shape[..., c],
+                padded_array[paste_y_start:paste_y_end, paste_x_start:paste_x_end, c]
+            )
+
+    # Crop the padded array back to the original image size
+    cropped_array = padded_array[border_size:border_size + rows, border_size:border_size + cols]
 
     # Convert array back to image
-    altered_img = Image.fromarray(img_array)
+    altered_img = Image.fromarray(cropped_array)
     return altered_img
