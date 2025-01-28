@@ -7,7 +7,7 @@ import cv2
 from PIL import Image
 
 
-def apply_circular_cutout_effect(image, center=None, num_rings=10, max_rotation=30):
+def apply_circular_cutout_effect(image, num_rings=10, max_rotation=30, center=None):
     """
     Apply a circular cutout effect to an image where concentric rings are progressively rotated.
 
@@ -36,8 +36,8 @@ def apply_circular_cutout_effect(image, center=None, num_rings=10, max_rotation=
 
     for i in range(num_rings):
         # Define inner and outer radius for the ring
-        r_inner = i * ring_width
-        r_outer = (i + 1) * ring_width
+        r_inner = i * ring_width - 3
+        r_outer = (i + 1) * ring_width + 3
 
         # Compute rotation angle
         angle = (1 - i / num_rings) * max_rotation
@@ -98,76 +98,6 @@ def create_spiral_cutout(
     # Create a mask for each ring and apply rotation
     output = img_array.copy()
     for i in range(num_rings + 1):  # Include the central circle as a "ring"
-        inner_r = center_radius + i * ring_width
-        outer_r = center_radius + (i + 1) * ring_width
-
-        # Ensure outer_r does not exceed max_radius
-        outer_r = min(outer_r, max_radius)
-
-        if i == 0:
-            outer_r = center_radius  # Define the center circle
-            inner_r = 0
-
-        # Create a mask for the current ring
-        mask = np.zeros((height, width), dtype=np.uint8)
-        cv2.circle(mask, center, outer_r, 255, thickness=-1)
-        cv2.circle(mask, center, inner_r, 0, thickness=-1)
-
-        # Extract ring
-        ring = cv2.bitwise_and(img_array, img_array, mask=mask)
-
-        # Determine rotation angle (innermost rotates most, outermost least)
-        rotation_angle = rotation_max * (1 - (i / (num_rings + 1)))
-
-        # Rotate ring
-        M = cv2.getRotationMatrix2D(center, rotation_angle, 1.0)
-        rotated_ring = cv2.warpAffine(ring, M, (width, height))
-
-        # Apply rotated ring back to the image
-        mask_inv = cv2.bitwise_not(mask)
-        output = cv2.bitwise_and(output, output, mask=mask_inv)
-        output += rotated_ring
-
-    # Convert back to PIL image
-    return Image.fromarray(output)
-
-
-def create_spiral_cutout_2(
-        image,
-        num_rings=10,
-        rotation_max=30,
-        center_size_factor=1.5,
-        center=None
-):
-    """
-    Creates a spiral cutout effect with rotating rings.
-
-    Parameters:
-        image (PIL.Image): Input image.
-        num_rings (int): Number of rings.
-        rotation_max (int): Maximum rotation angle (innermost ring rotates the most, outer rings less).
-        center_size_factor (float): Determines center circle size relative to ring width.
-        center (tuple): (x, y) coordinates for the spiral center. Default: center of the image.
-
-    Returns:
-        PIL.Image: Image with spiral effect.
-    """
-    # Convert image to OpenCV format
-    img_array = np.array(image)
-    height, width, _ = img_array.shape
-
-    # Determine center
-    if center is None:
-        center = (width // 2, height // 2)
-
-    # Determine ring widths and max radius
-    max_radius = min(center[0], center[1], width - center[0], height - center[1])
-    ring_width = max_radius // (num_rings + 1)  # Ensure rings fit within the image
-    center_radius = int(center_size_factor * ring_width)
-
-    # Create a mask for each ring and apply rotation
-    output = img_array.copy()
-    for i in range(num_rings + 1):  # Include the central circle as a "ring"
         inner_r = max(1, center_radius + i * ring_width)
         outer_r = min(center_radius + (i + 1) * ring_width, max_radius)
 
@@ -176,7 +106,7 @@ def create_spiral_cutout_2(
             inner_r = 0
 
         # Create a mask for the current ring
-        mask = np.zeros((height, width), dtype=np.uint8)
+        mask = np.ones((height, width), dtype=np.uint8)
         cv2.circle(mask, center, outer_r, 255, thickness=-1)  # Slight overlap to remove gaps
         cv2.circle(mask, center, inner_r, 0, thickness=-1)  # Ensure inner_r is never negative
 

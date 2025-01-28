@@ -5,18 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e428f1c4-7e7f-42b6-8545-2a47d7585966" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/koike_sauvin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/PortraitGPT.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PortraitGPT.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/ArT_profile_picture-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ArT_profile_picture.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ArT_profile_picture.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/input/002_presSeries-500x250.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/input/1000_F_561891054_gE7jq4E6raHL0x44MnGZQBiAhYLPFmQh.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/input/1a032a74-193c-4c7d-9388-06a76edf95bd.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/input/colors, comic.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/input/ee9c7076d4d02063b5bcaf07408f5ad0.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/input/foto_voorbeeld.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/koike_sauvin.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/koike_sauvin.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +89,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-fb887030ada0-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.21565.199" />
+        <option value="bundled-python-sdk-0509580d9d50-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.14494.241" />
       </set>
     </attachedChunks>
   </component>
