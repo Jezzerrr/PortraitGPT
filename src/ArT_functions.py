@@ -17,7 +17,9 @@ from PIL import Image
 def alter_image_boxes_away_from_center(image, num_rectangles=20):
     # Convert image to an array
     img_array = np.array(image)
-    rows, cols, channels = img_array.shape
+    # rows, cols, channels = img_array.shape
+    rows = img_array.shape[0]
+    cols = img_array.shape[1]
 
     # For each rectangle
     for _ in range(num_rectangles):
@@ -58,7 +60,9 @@ def alter_image_boxes_away_from_center(image, num_rectangles=20):
 def alter_image_boxes(image, num_rectangles=20, magnitude=1):
     # Convert image to an array
     img_array = np.array(image)
-    rows, cols, channels = img_array.shape
+    # rows, cols, channels = img_array.shape
+    rows = img_array.shape[0]
+    cols = img_array.shape[1]
 
     for _ in range(num_rectangles):
         # Determine smaller dimensions for the rectangle based on image size
@@ -116,7 +120,9 @@ def alter_image_boxes_rotation(
     """
     # Convert image to an array
     img_array = np.array(image)
-    rows, cols, channels = img_array.shape
+    # rows, cols, channels = img_array.shape
+    rows = img_array.shape[0]
+    cols = img_array.shape[1]
 
     for _ in range(num_rectangles):
         # Determine rectangle dimensions
@@ -241,7 +247,9 @@ def alter_image_shapes(
     """
     # Convert image to an array
     img_array = np.array(image)
-    rows, cols, channels = img_array.shape
+    # rows, cols, channels = img_array.shape
+    rows = img_array.shape[0]
+    cols = img_array.shape[1]
 
     for _ in range(num_shapes):
         # Determine shape dimensions
@@ -320,7 +328,9 @@ def alter_image_shapes_with_border_expansion(
     """
     # Convert image to an array
     img_array = np.array(image)
-    rows, cols, channels = img_array.shape
+    # rows, cols, channels = img_array.shape
+    rows = img_array.shape[0]
+    cols = img_array.shape[1]
 
     # Add a temporary border (e.g., 20% of the image size)
     border_size = max(rows, cols) // 5
@@ -417,7 +427,9 @@ def alter_image_shapes_with_border_expansion_2(
     """
     # Convert image to an array
     img_array = np.array(image)
-    rows, cols, channels = img_array.shape
+    # rows, cols, channels = img_array.shape
+    rows = img_array.shape[0]
+    cols = img_array.shape[1]
 
     # Add a temporary border (e.g., 20% of the image size)
     border_size = max(rows, cols) // 5

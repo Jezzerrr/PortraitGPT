@@ -19,9 +19,30 @@ def extract_square(input_image_path, target_size=False):
 
     # Calculate the coordinates for cropping to get the middle part
     left = (img.width - min_dimension) // 2
-    top = (img.height - min_dimension) // 2
     right = (img.width + min_dimension) // 2
+    top = (img.height - min_dimension) // 2
     bottom = (img.height + min_dimension) // 2
+
+    # Crop the image
+    img_cropped = img.crop((left, top, right, bottom))
+    if target_size:
+        img_cropped = decrease_image_size(img_cropped, target_size)
+
+    return img_cropped
+
+
+def extract_square_mod(input_image_path, target_size=False, move_vertical=1, move_horizontal=1, zoom=1):
+    # Load the original image
+    img = Image.open(input_image_path)
+
+    # Determine the size to create a square image
+    min_dimension = min(img.width, img.height) * zoom
+
+    # Calculate the coordinates for cropping to get the middle part
+    left   = (img.width  * move_horizontal - min_dimension) // 2
+    right  = (img.width  * move_horizontal + min_dimension) // 2
+    top    = (img.height * move_vertical   - min_dimension) // 2
+    bottom = (img.height * move_vertical   + min_dimension) // 2
 
     # Crop the image
     img_cropped = img.crop((left, top, right, bottom))

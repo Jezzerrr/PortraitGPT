@@ -101,7 +101,9 @@ def alter_image_shapes(image, shape_type="rectangle", shape_size=50, num_shapes=
     else:
         img_array = image
 
-    rows, cols, _ = img_array.shape
+    # rows, cols, _ = img_array.shape
+    rows = img_array.shape[0]
+    cols = img_array.shape[1]
 
     for _ in range(num_shapes):
         # Random center and size for the shape
