@@ -6,3 +6,6 @@ input/others
 output/*/
 input/*/
 ai_model_output/*/
+documentation.docx
+on_paper/
+qr.ipynb
