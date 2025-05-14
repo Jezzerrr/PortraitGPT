@@ -1,19 +1,8 @@
-import numpy as np
-import pandas as pd
-from matplotlib import pyplot as plt
-from scipy.stats import linregress
-from datetime import datetime
 import random
-import os
-import seaborn as sns
 
-from PIL import Image
-from skimage.filters import gaussian
-from skimage.color import rgb2lab, lab2rgb
-from skimage.filters.rank import gradient
-from skimage.morphology import dilation, disk
-from skimage.segmentation import slic
-from skimage.measure import regionprops
+import numpy as np
+import seaborn as sns
+from matplotlib import pyplot as plt
 
 
 def get_matplotlib_palette(palette_name='viridis', n_colors=40, randomize=True):
@@ -65,7 +54,7 @@ def get_seaborn_palette(palette_name='husl', n_colors=40, randomize=True):
     else:
         palette = sns.color_palette(palette_name, n_colors)
 
-    return [(int( r *255), int( g *255), int( b *255)) for r, g, b in palette]
+    return [(int(r * 255), int(g * 255), int(b * 255)) for r, g, b in palette]
 
 
 def get_colorbrewer_palette(palette_name='Set3', n_colors=40, randomize=True):
@@ -149,8 +138,7 @@ def get_tableau_palette(palette_name='Tableau_10', n_colors=40, randomize=True):
 
     Args:
         palette_name: Name of the Tableau palette
-            Examples: 'Tableau_10', 'Tableau_20', 'ColorBlind_10', 'TableauLight_10',
-                      'TableauMedium_10', 'TableauDark_10'
+            Examples: 'Tableau_10', 'Tableau_20', 'ColorBlind_10', 'TableauLight_10', 'TableauMedium_10', 'TableauDark_10'
         n_colors: Number of colors to get from the palette
         randomize: If True, randomly sample colors from the palette
 

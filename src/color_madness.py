@@ -82,7 +82,7 @@ def segment_image_with_variance_based_regions_2(
         blur_sigma=2,
         gradient_disk_size=5,
         variance_threshold=0.2,
-        noise_level=0.1,
+        noise_level=0,
 ):
     img_array = np.array(img)
     # Convert image to LAB color space for better segmentation
@@ -104,8 +104,7 @@ def segment_image_with_variance_based_regions_2(
     img_lab_blurred = gaussian(img_lab_noisy, sigma=blur_sigma)
 
     # Map gradient values to local region size adjustment
-    gradient_scaled_regions = (base_number_of_regions * (1 + (1 - normalized_gradient) * variance_threshold)).astype(
-        int)
+    gradient_scaled_regions = (base_number_of_regions * (1 + (1 - normalized_gradient) * variance_threshold)).astype(int)
 
     # Perform SLIC segmentation with dynamic region adjustments
     segments = slic(
@@ -134,7 +133,7 @@ def segment_image_with_variance_based_regions_2(
             segmented_img[coords[:, 0], coords[:, 1]] = color
 
     # Post-process: Apply dilation for more irregular region borders
-    for c in range(3):  # Iterate over color channels
+    for c in range(1):  # Iterate over color channels
         segmented_img[..., c] = dilation(segmented_img[..., c], disk(1))  # Use a disk kernel for dilation
 
     # Convert back to PIL image
@@ -164,24 +163,3 @@ def add_adaptive_noise(img_lab, gradient_map, noise_level=0.1):
 
     # Apply weighted noise to the image
     return img_lab + noise * noise_weight
-
-
-color_palette1 = [
-    [255, 87, 51],   # Coral red
-    [50, 168, 82],   # Green
-    [97, 175, 239],  # Sky blue
-    [255, 195, 0],   # Golden yellow
-    [155, 89, 182],  # Purple
-    [52, 152, 219],  # Blue
-    [243, 156, 18],  # Orange
-    [231, 76, 60],   # Red
-    [46, 204, 113],  # Emerald
-    [149, 165, 166], # Gray
-]
-
-color_palette2 = [
-    [255, 0, 0],    # Red
-    [0, 255, 0],    # Green
-    [0, 0, 255],    # Blue
-    [255, 255, 0],  # Yellow
-]

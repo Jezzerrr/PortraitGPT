@@ -62,12 +62,17 @@ def decrease_image_size(img, target_size):
 
 def save_image_with_unique_name(img, output_base_path='output/output_image.jpg'):
     # Check if the file exists and create a unique name
+    output_image_path = create_unique_file_name(output_base_path)
+
+    # Save the image
+    img.save(output_image_path)
+    return output_image_path
+
+
+def create_unique_file_name(output_base_path):
     count = 0
     output_image_path = output_base_path
     while os.path.exists(output_image_path):
         count += 1
         output_image_path = f"{output_base_path.rsplit('.', 1)[0]}_{count}.{output_base_path.rsplit('.', 1)[1]}"
-
-    # Save the image
-    img.save(output_image_path)
     return output_image_path
