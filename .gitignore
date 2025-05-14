@@ -5,3 +5,4 @@ __pycache__/
 input/others
 output/*/
 input/*/
+ai_model_output/*/
