@@ -175,6 +175,74 @@ def alter_image_boxes_rotation(
     return altered_img
 
 
+def alter_image_boxes_rotation_2(
+        image,
+        shape_size=1,
+        num_rectangles=20,
+        magnitude_shift=1,
+        rotation_mean=0,
+        rotation_var=0
+):
+    """
+    Alters an image by moving and rotating full rectangles, resulting in diamond/rhombus shapes.
+
+    Parameters:
+        image (PIL.Image): Input image.
+        shape_size (int): Size multiplier for rectangles.
+        num_rectangles (int): Number of rectangles to alter.
+        magnitude_shift (float): Factor determining how much rectangles move towards the center.
+        rotation_mean (int): Average rotation angle in degrees for the shapes.
+        rotation_var (int): Variation of the rotation angle in degrees for the shapes.
+
+    Returns:
+        PIL.Image: The altered image.
+    """
+    img_array = np.array(image)
+    rows, cols = img_array.shape[:2]
+
+    for _ in range(num_rectangles):
+        # Determine rectangle dimensions
+        rect_width = np.random.randint(cols // 50, cols // 20) * 2 * shape_size
+        rect_height = np.random.randint(rows // 50, rows // 20) * 2 * shape_size
+
+        # Choose a random starting point for the rectangle
+        start_x = np.random.randint(0, cols - rect_width)
+        start_y = np.random.randint(0, rows - rect_height)
+
+        # Extract the rectangle
+        rectangle = img_array[start_y:start_y + rect_height, start_x:start_x + rect_width].copy()
+
+        # Create a transparent canvas to place the rectangle
+        canvas = np.zeros_like(img_array)
+        canvas[start_y:start_y + rect_height, start_x:start_x + rect_width] = rectangle
+
+        # Rotate the entire canvas to rotate the rectangle as a whole shape
+        angle = np.random.uniform(rotation_mean - rotation_var, rotation_mean + rotation_var)
+        rotated_canvas = scipy_rotate(canvas, angle, reshape=False, mode='constant', cval=0)
+
+        # Determine the direction to move (towards center)
+        center_x, center_y = cols // 2, rows // 2
+        shift_x = -(center_x - start_x) // 20
+        shift_y = -(center_y - start_y) // 20
+
+        # New position to paste rectangle
+        new_x = int(start_x + shift_x * magnitude_shift)
+        new_y = int(start_y + shift_y * magnitude_shift)
+
+        # Create a mask to identify non-zero pixels in the rotated canvas
+        mask = np.any(rotated_canvas != 0, axis=-1)
+
+        # Paste the rotated rectangle onto the original image using the mask
+        for y in range(rows):
+            for x in range(cols):
+                if mask[y, x]:
+                    img_array[y, x] = rotated_canvas[y, x]
+
+    # Convert array back to image
+    altered_img = Image.fromarray(img_array)
+    return altered_img
+
+
 def create_shape_mask(shape, width, height, angle=0):
     """
     Creates a binary mask for the specified shape.
@@ -430,6 +498,7 @@ def alter_image_shapes_with_border_expansion_2(
     # rows, cols, channels = img_array.shape
     rows = img_array.shape[0]
     cols = img_array.shape[1]
+    channels = img_array.shape[2]
 
     # Add a temporary border (e.g., 20% of the image size)
     border_size = max(rows, cols) // 5
